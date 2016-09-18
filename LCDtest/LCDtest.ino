@@ -30,6 +30,7 @@ void setup()
  lcd.begin(16, 2);
  lcd.setCursor(0,0);
  lcd.print("Push the buttons"); 
+ analogWrite(10, 1023);
 }
  
 void loop()
