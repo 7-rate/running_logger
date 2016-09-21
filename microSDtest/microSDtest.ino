@@ -1,4 +1,5 @@
 #include <SPI.h>
+
 #include <SD.h>
 
 #define CABLESELECTPIN	3
@@ -47,7 +48,6 @@ void setup()
 	// EhternetShieldの場合は、CSはpin4だが、
 	// その場合でも、pin10は、出力ピンに設定する必要がある。
 	pinMode(10, OUTPUT);
-        pinMode(3,  OUTPUT);
 
 	Serial.print("SD read write test start...\n");
 
