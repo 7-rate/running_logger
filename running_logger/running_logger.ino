@@ -7,7 +7,7 @@
 
 #define I2C_ADDRES_ACCEL 0x1D     //加速度センサー(ADXL345)
 #define I2C_ADDRES_COMPASS 0x1E   //地磁器センサー(HMC5883L)
-#define I2C_ADDRES_AIRSTATE 0x77  //温度、湿度、大気圧センサー(BME280)
+#define I2C_ADDRES_AIRSTATE 0x76  //温度、湿度、大気圧センサー(BME280)
 
 #define COMPASS_DATA_X 0x03
 #define COMPASS_DATA_Y 0x07
@@ -71,24 +71,25 @@ void loop()
 
   getAirstate(airstate_data);
   getCompass(compass_data);
+  getAccel(accel_data);
   deg = getDegree(compass_data);
 
-  //  Serial.println(deg);
+   // Serial.println(deg);
 /*
   Serial.print(compass_data[X]);
   Serial.print(" ");
   Serial.print(compass_data[Y]);
   Serial.print(" ");
   Serial.println(compass_data[Z]);
-  */
-
+ */ 
+  
   Serial.print(airstate_data[TEMP]);
   Serial.print("℃　");
   Serial.print(airstate_data[PRESS]);
   Serial.print("hPa　");
   Serial.print(airstate_data[HUM]);
   Serial.println("%");
-
+  
   /*
     Serial.println(accel_data[0]);
     Serial.println(accel_data[1]);
