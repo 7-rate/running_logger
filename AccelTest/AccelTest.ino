@@ -20,8 +20,9 @@ enum{X, Y, Z};
 enum{TEMP, PRESS, HUM};
 
 float speed_x=0.0, speed_y=0.0;
-float cm_x=0.0, cm_y=0.0;
-float low_x = 0.0, low_y = 0.0, low_z = 0.0;
+long cm_x=0, cm_y=0;
+int16_t raw_x, raw_y;
+int16_t low_x, low_y, low_z;
 
 void setup()
 {
@@ -42,10 +43,29 @@ void loop()
     static long l;
 
     if(l != millis()) {
-        Accel_integral();
+        Accel_integral2();
         l = millis();
-        if(!(l % 1000)) Accel_integral_print();
+        if(!(l % 500)) Accel_integral_print2();
     }
+}
+
+void Accel_integral2() {
+    byte data[6];
+
+
+    //センサー値をレジスタから取得
+    readI2C(I2C_ADDRES_ACCEL, 0x32, 6, data);
+
+    //取得したデータを16bitのデータにする
+    raw_x = ByteToInt(data[0], data[1]);
+    raw_y = ByteToInt(data[2], data[3]);
+
+    //ローパスフィルタ
+    low_x = 9 * raw_x + low_x;
+    low_y = 9 * raw_y + low_y;
+
+/*    cm_x += raw;
+	cm_y += low_y / 256.0;*/
 }
 
 void Accel_integral() {
@@ -81,6 +101,12 @@ void Accel_integral_print() {
     Serial.print(cm_x);
     Serial.print(",");
     Serial.println(cm_y);
+}
+
+void Accel_integral_print2() {
+    Serial.print(low_x);
+    Serial.print(",");
+    Serial.println(low_y);
 }
 
 #if 0
