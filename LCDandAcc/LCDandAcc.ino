@@ -1,4 +1,6 @@
-//#include <SparkFunBME280.h>
+/*********************************************************************/
+/*    include                                                        */
+/*********************************************************************/
 #include <LiquidCrystal.h>
 #include <SPI.h>
 #include <SD.h>
@@ -9,6 +11,9 @@
 #include <MsTimer2.h>
 #include <EEPROM.h>
 
+/*********************************************************************/
+/*    定数定義                                                       */
+/*********************************************************************/
 #define I2C_ADDRES_ACCEL 0x1D		//加速度センサー(ADXL345)
 #define I2C_ADDRES_COMPASS 0x1E		//地磁器センサー(HMC5883L)
 #define I2C_ADDRES_AIRSTATE 0x77	//温度、湿度、大気圧センサー(BME280)
@@ -18,12 +23,26 @@
 #define COMPASS_DATA_Z 0x05
 #define CABLESELECTPIN 3
 
-
-#define ByteToInt(under, upper) (upper<<8 | under) //8bitを16bitに変換する
-
 enum{X, Y, Z};
 enum{TEMP, PRESS, HUM};
 
+enum {
+	btnRIGHT,
+	btnUP,
+	btnDOWN,
+	btnLEFT,
+	btnSELECT,
+	btnNONE
+};
+
+/*********************************************************************/
+/*    マクロ定義                                                     */
+/*********************************************************************/
+#define ByteToInt(under, upper) (upper<<8 | under) //8bitを16bitに変換する
+
+/*********************************************************************/
+/*    グローバル変数宣言                                             */
+/*********************************************************************/
 volatile int16_t speed_x, speed_y;
 volatile long cm_x=0, cm_y=0;
 volatile int16_t raw_x, raw_y;
@@ -33,8 +52,15 @@ volatile float fx, fy;
 boolean isSdWrite;
 char filename[16] = {0};
 
+/*********************************************************************/
+/*    pinMode設定                                                    */
+/*********************************************************************/
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
+
+/*********************************************************************/
+/*    初期設定                                                       */
+/*********************************************************************/
 void setup()
 {
 	int num;
@@ -73,6 +99,9 @@ void setup()
 	lcd.print(num);
 }
 
+/*********************************************************************/
+/*    メインループ                                                   */
+/*********************************************************************/
 void loop()
 {
 	static long l;
@@ -82,7 +111,7 @@ void loop()
 		l = millis();
 		//if(!(l % 500)) Accel_integral_print3();
 		if(!(l%1000)) {
-			writeSd_Accel();
+			if(isSdWrite) writeSd_Accel();
 			Accel_integral_print3();
 		}
 	}
@@ -175,13 +204,51 @@ void Accel_integral_print3() {
 void writeSd_Accel() {
 	char buf[64] = {0};
 
-	
 	sprintf( buf, "%d,%d\n", raw_x, raw_y);
 	SDWriteString( filename, buf);
 }
 
 /*********************************************************************/
-/*    ADXL345                                                       */
+/*    LCD                                                            */
+/*********************************************************************/
+void LCDProcess()
+{
+	static int lcdPattern = 0;
+
+	switch(lcdPattern) {
+	case 0:
+		break;
+		
+	case 1:
+		break;
+		
+	default:
+		break;
+	}
+}
+
+int getSwFlag(int btn)
+{
+
+}
+
+int getSwNow()
+{
+	int adc_key_in = analogRead(0);
+
+	if (adc_key_in > 1000) return btnNONE;
+
+	if (adc_key_in < 50)	return btnRIGHT;  
+	if (adc_key_in < 250)	return btnUP; 
+	if (adc_key_in < 450)	return btnDOWN; 
+	if (adc_key_in < 650)	return btnLEFT; 
+	if (adc_key_in < 850)	return btnSELECT;  
+
+	return btnNONE;
+}
+
+/*********************************************************************/
+/*    ADXL345                                                        */
 /*********************************************************************/
 void getAccel(float accel_data[])
 {
