@@ -8,7 +8,6 @@
 #include <stdint.h>
 #include <arduino.h>
 #include <math.h>
-#include <MsTimer2.h>
 #include <EEPROM.h>
 
 /*********************************************************************/
@@ -49,6 +48,7 @@ volatile int16_t raw_x, raw_y;
 volatile int16_t low_x=0, low_y=0, low_z;
 volatile int16_t hx, hy;
 volatile float fx, fy;
+
 boolean isSdWrite;
 char filename[16] = {0};
 
@@ -64,6 +64,8 @@ LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 void setup()
 {
 	int num;
+	byte data[6];
+	long cal_x=0,cal_y=0;
 	
 	Wire.begin();
 	writeI2C(I2C_ADDRES_ACCEL, 0x31, 0x00); //range +-2g
@@ -83,18 +85,18 @@ void setup()
 	sprintf(filename, "log_%03d.csv", num);
 	if( !SD.begin(CABLESELECTPIN) ) {
 		lcd.setCursor(0, 0);
-		lcd.print("Failed:SD.begin ");
+		lcd.print("SDInitFailed    ");
 		isSdWrite = false;
 	} else {
 		lcd.setCursor(0, 0);
-		lcd.print("Success:SD.begin");
+		lcd.print("SDInitSuccess   ");
 		isSdWrite = true;
+		EEPROM.write(0, ++num);
 	}
 	if(isSdWrite) {
 		SDWriteString( filename, "logingTest\n");
 	}
-	EEPROM.write(0, ++num);
-
+	
 	lcd.setCursor(15, 1);
 	lcd.print(num);
 }
